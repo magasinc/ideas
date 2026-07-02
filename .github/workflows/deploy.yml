@@ -4,7 +4,6 @@ on:
   push:
     branches: ["main"]
 
-# Permisos necesarios para evitar el error de Timeout
 permissions:
   contents: read
   pages: write
@@ -12,7 +11,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true # Cancela automáticamente intentos trabados si haces un nuevo push
 
 jobs:
   deploy:
@@ -30,9 +29,12 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Subimos la raíz del proyecto porque ahí está tu index.html
           path: '.'
+          # Evitamos subir node_modules para que el despliegue sea instantáneo
+          exclude: |
+            node_modules/
+            .git/
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5 # Actualizado a v5
